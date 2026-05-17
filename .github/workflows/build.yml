@@ -1,30 +1,50 @@
-# A simple action usage
-name: Build Kernel
+name: CI
 on:
+  push:
+    branches: main
+    paths:
+      - '.github/workflows/main.yml'
+      - 'action.yml'
+      - 'src/**/*.ts'
+      - 'package.json'
+      - 'yarn.lock'
+
+  pull_request:
+    paths:
+      - '.github/workflows/main.yml'
+      - 'action.yml'
+      - 'src/**/*.ts'
+      - 'package.json'
+      - 'yarn.lock'
+
   workflow_dispatch:
 
 jobs:
-  Build-Kernel:
+  ci-test:
+    name: Build Kernel
     strategy:
       fail-fast: false
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
 
     steps:
-      - name: Build Kernel
-        uses: dabao1955/kernel_build_action@main
-        with:
-          kernel-url: https://github.com/AcmeUI-Devices/android_kernel_xiaomi_cas
-          kernel-dir: msm-4.19
-          kernel-branch: taffy
-          config: cas_defconfig
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Build Kernel
+      uses: ./
+      with:
+          kernel-url: https://github.com/KrutosVIP/generic_kernel_mediatek_alps
+          kernel-dir: mt6765-4.19
+          kernel-branch: 4.19.191_mt6765        # Binago base sa branch list mo
+          config: k65v1_64_bsp_defconfig         # Binago base sa configs folder mo
           arch: arm64
           aosp-gcc: true
           aosp-clang: true
-          ksu: true
+          ksu: true                              # KernelSU para may built-in root na agad
           ksu-version: main
-          android-version: 12
+          android-version: 11
           aosp-clang-version: r383902
           disable-lto: true
           anykernel3: true
